@@ -20,3 +20,7 @@ primary_region = 'cdg'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+
+[env]
+  ENVIRONMENT = 'production'
+  FRONT_URL = 'https://bara-app-v2.vercel.app'
