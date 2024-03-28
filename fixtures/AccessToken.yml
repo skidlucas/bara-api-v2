@@ -1,0 +1,6 @@
+entity: AccessToken
+items:
+  accesstoken{1..3}:
+    id: '{{string.uuid}}'
+    ttl: 2147483647
+    physiotherapist: '@physiotherapist($current)'

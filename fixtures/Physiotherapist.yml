@@ -1,0 +1,17 @@
+entity: Physiotherapist
+items:
+  physiotherapist1:
+    firstname: Barbara
+    lastname: Tellenne
+    email: barbara@gmail.com
+    password: tototoO0
+  physiotherapist2:
+    firstname: Alicia
+    lastname: Tétard
+    email: alicia@gmail.com
+    password: tototoO0
+  physiotherapist3:
+    firstname: Valentine
+    lastname: Plat
+    email: valentine@gmail.com
+    password: tototoO0
