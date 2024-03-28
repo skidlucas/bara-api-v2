@@ -1,4 +1,5 @@
 entity: Physiotherapist
+processor: ../dist/fixtures/processors/PhysiotherapistProcessor
 items:
   physiotherapist1:
     firstname: Barbara

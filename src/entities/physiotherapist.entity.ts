@@ -15,7 +15,11 @@ import { AccessToken } from './access-token.entity';
 
 @Entity()
 @Unique(['email'])
-export class Physiotherapist extends BaseEntity {
+export class Physiotherapist {
+  constructor(init?: Partial<Physiotherapist>) {
+    Object.assign(this, init);
+  }
+
   @PrimaryGeneratedColumn()
   id: number;
 

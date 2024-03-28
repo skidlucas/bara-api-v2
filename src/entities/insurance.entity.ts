@@ -12,7 +12,11 @@ import { Patient } from './patient.entity';
 import { Invoice } from './invoice.entity';
 
 @Entity()
-export class Insurance extends BaseEntity {
+export class Insurance {
+  constructor(init?: Partial<Insurance>) {
+    Object.assign(this, init);
+  }
+
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FixtureModule } from './modules/fixture/fixture.module';
+import { PhysiotherapistModule } from './modules/physiotherapist/physiotherapist.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { FixtureModule } from './modules/fixture/fixture.module';
       logging: 'all', // remove in prod?
     }),
     FixtureModule,
+    PhysiotherapistModule,
   ],
   controllers: [AppController],
   providers: [AppService],

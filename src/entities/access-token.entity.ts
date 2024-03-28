@@ -10,7 +10,11 @@ import {
 import { Physiotherapist } from './physiotherapist.entity';
 
 @Entity()
-export class AccessToken extends BaseEntity {
+export class AccessToken {
+  constructor(init?: Partial<AccessToken>) {
+    Object.assign(this, init);
+  }
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
