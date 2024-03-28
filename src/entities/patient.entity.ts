@@ -1,84 +1,80 @@
 import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  RelationId,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Physiotherapist } from './physiotherapist.entity';
-import { Invoice } from './invoice.entity';
-import { Insurance } from './insurance.entity';
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    RelationId,
+    UpdateDateColumn,
+} from 'typeorm'
+import { Physiotherapist } from './physiotherapist.entity'
+import { Invoice } from './invoice.entity'
+import { Insurance } from './insurance.entity'
 
 @Entity()
 export class Patient {
-  constructor(init?: Partial<Patient>) {
-    Object.assign(this, init);
-  }
+    constructor(init?: Partial<Patient>) {
+        Object.assign(this, init)
+    }
 
-  @PrimaryGeneratedColumn()
-  id: number;
+    @PrimaryGeneratedColumn()
+    id: number
 
-  @Column()
-  lastname: string;
+    @Column()
+    lastname: string
 
-  @Column()
-  firstname: string;
+    @Column()
+    firstname: string
 
-  @Column({ nullable: true })
-  gender: string;
+    @Column({ nullable: true })
+    gender: string
 
-  @Column({ nullable: true })
-  phone: string;
+    @Column({ nullable: true })
+    phone: string
 
-  @Column({ nullable: true })
-  email: string;
+    @Column({ nullable: true })
+    email: string
 
-  @Column({ nullable: true })
-  address: string;
+    @Column({ nullable: true })
+    address: string
 
-  @Column({ nullable: true })
-  zipCode: string;
+    @Column({ nullable: true })
+    zipCode: string
 
-  @Column({ nullable: true })
-  city: string;
+    @Column({ nullable: true })
+    city: string
 
-  @Column({ nullable: true })
-  country: string;
+    @Column({ nullable: true })
+    country: string
 
-  @Column('date', { nullable: true })
-  dateOfBirth: Date;
+    @Column('date', { nullable: true })
+    dateOfBirth: Date
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @CreateDateColumn()
+    createdAt: Date
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+    @UpdateDateColumn()
+    updatedAt: Date
 
-  @ManyToOne(
-    () => Physiotherapist,
-    (physiotherapist) => physiotherapist.patients,
-  )
-  @JoinColumn()
-  physiotherapist: Physiotherapist;
+    @ManyToOne(() => Physiotherapist, (physiotherapist) => physiotherapist.patients)
+    @JoinColumn()
+    physiotherapist: Physiotherapist
 
-  @Column()
-  @RelationId((patient: Patient) => patient.physiotherapist)
-  physiotherapistId: number;
+    @Column()
+    @RelationId((patient: Patient) => patient.physiotherapist)
+    physiotherapistId: number
 
-  @OneToMany(() => Invoice, (invoice) => invoice.patient)
-  @JoinColumn()
-  invoices: Invoice[];
+    @OneToMany(() => Invoice, (invoice) => invoice.patient)
+    @JoinColumn()
+    invoices: Invoice[]
 
-  @ManyToOne(() => Insurance, (insurance) => insurance.patients)
-  @JoinColumn()
-  insurance: Insurance;
+    @ManyToOne(() => Insurance, (insurance) => insurance.patients)
+    @JoinColumn()
+    insurance: Insurance
 
-  @Column({ nullable: true })
-  @RelationId((patient: Patient) => patient.insurance)
-  insuranceId: number;
+    @Column({ nullable: true })
+    @RelationId((patient: Patient) => patient.insurance)
+    insuranceId: number
 }
