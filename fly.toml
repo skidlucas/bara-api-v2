@@ -23,4 +23,5 @@ primary_region = 'cdg'
 
 [env]
   ENVIRONMENT = 'production'
+  PORT = 3000
   FRONT_URL = 'https://bara-app-v2.vercel.app'
