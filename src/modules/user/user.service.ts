@@ -1,27 +1,32 @@
 import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common'
-import { PhysiotherapistSignUpDto } from './dto/physiotherapist-sign-up.dto'
-import { Physiotherapist } from '../../entities/physiotherapist.entity'
-import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
+import { User } from '../../entities/user.entity'
+import { Repository } from 'typeorm'
+import { UserSignUpDto } from './dto/user.dto'
 import { hashPassword } from '../../utils/utils'
 
 @Injectable()
-export class PhysiotherapistService {
+export class UserService {
     constructor(
-        @InjectRepository(Physiotherapist)
-        private physioRepository: Repository<Physiotherapist>,
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
     ) {}
-    async signUp(physiotherapistSignUpDto: PhysiotherapistSignUpDto) {
-        const { email, password, firstname } = physiotherapistSignUpDto
 
-        const physio = new Physiotherapist({
+    async findByEmail(email: string): Promise<User> {
+        // todo improve this ? 404 if not found?
+        return this.userRepository.findOne({ where: { email } })
+    }
+    async signUp(userDto: UserSignUpDto) {
+        const { email, password, firstname } = userDto
+
+        const user = new User({
             email,
             firstname,
             password: hashPassword(password),
         })
 
         try {
-            await this.physioRepository.save(physio)
+            await this.userRepository.save(user)
         } catch (error) {
             if (error.code === '23505') {
                 // duplicate email

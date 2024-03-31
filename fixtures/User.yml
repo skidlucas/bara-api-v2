@@ -1,18 +1,15 @@
-entity: Physiotherapist
-processor: ../dist/fixtures/processors/PhysiotherapistProcessor
+entity: User
+processor: ../dist/fixtures/processors/UserProcessor
 items:
-  physiotherapist1:
+  user1:
     firstname: Barbara
-    lastname: Tellenne
     email: barbara@gmail.com
     password: tototoO0
-  physiotherapist2:
+  user2:
     firstname: Alicia
-    lastname: Tétard
     email: alicia@gmail.com
     password: tototoO0
-  physiotherapist3:
+  user3:
     firstname: Valentine
-    lastname: Plat
     email: valentine@gmail.com
     password: tototoO0

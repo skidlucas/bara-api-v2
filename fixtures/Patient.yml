@@ -11,7 +11,7 @@ items:
     zipCode: 13600
     country: FRANCE
     dateOfBirth: '1993-12-26'
-    physiotherapist: '@physiotherapist1'
+    physiotherapist: '@user1'
     insurance: '@insurance1'
   patient2:
     firstname: Hugo
@@ -24,7 +24,7 @@ items:
     zipCode: 83640
     country: FRANCE
     dateOfBirth: '1989-07-28'
-    physiotherapist: '@physiotherapist1'
+    physiotherapist: '@user1'
     insurance: '@insurance1'
   patient3:
     firstname: Astrid
@@ -37,5 +37,5 @@ items:
     zipCode: 83640
     country: FRANCE
     dateOfBirth: '1989-04-13'
-    physiotherapist: '@physiotherapist2'
+    physiotherapist: '@user2'
     insurance: '@insurance2'

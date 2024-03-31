@@ -14,8 +14,8 @@ import { AccessToken } from './access-token.entity'
 
 @Entity()
 @Unique(['email'])
-export class Physiotherapist {
-    constructor(init?: Partial<Physiotherapist>) {
+export class User {
+    constructor(init?: Partial<User>) {
         Object.assign(this, init)
     }
 
@@ -46,7 +46,7 @@ export class Physiotherapist {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @OneToMany(() => AccessToken, (accessToken) => accessToken.physiotherapist, {
+    @OneToMany(() => AccessToken, (accessToken) => accessToken.user, {
         cascade: true,
     })
     accessTokens: AccessToken[]

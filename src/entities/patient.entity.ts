@@ -9,7 +9,7 @@ import {
     RelationId,
     UpdateDateColumn,
 } from 'typeorm'
-import { Physiotherapist } from './physiotherapist.entity'
+import { User } from './user.entity'
 import { Invoice } from './invoice.entity'
 import { Insurance } from './insurance.entity'
 
@@ -58,9 +58,9 @@ export class Patient {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @ManyToOne(() => Physiotherapist, (physiotherapist) => physiotherapist.patients)
+    @ManyToOne(() => User, (user) => user.patients)
     @JoinColumn()
-    physiotherapist: Physiotherapist
+    physiotherapist: User
 
     @Column()
     @RelationId((patient: Patient) => patient.physiotherapist)

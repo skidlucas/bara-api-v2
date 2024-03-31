@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, RelationId } from 'typeorm'
-import { Physiotherapist } from './physiotherapist.entity'
+import { User } from './user.entity'
 
 @Entity()
 export class AccessToken {
@@ -16,10 +16,10 @@ export class AccessToken {
     @CreateDateColumn()
     createdAt: Date
 
-    @ManyToOne(() => Physiotherapist, (physiotherapist) => physiotherapist.accessTokens)
-    physiotherapist: Physiotherapist
+    @ManyToOne(() => User, (user) => user.accessTokens)
+    user: User
 
     @Column()
-    @RelationId((accessToken: AccessToken) => accessToken.physiotherapist)
-    physiotherapistId: number
+    @RelationId((accessToken: AccessToken) => accessToken.user)
+    userId: number
 }

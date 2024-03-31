@@ -4,7 +4,10 @@ import { AppService } from './app.service'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { FixtureModule } from './modules/fixture/fixture.module'
-import { PhysiotherapistModule } from './modules/physiotherapist/physiotherapist.module'
+import { UserModule } from './modules/user/user.module'
+import { AuthModule } from './modules/auth/auth.module'
+import { APP_GUARD } from '@nestjs/core'
+import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard'
 
 @Module({
     imports: [
@@ -21,9 +24,16 @@ import { PhysiotherapistModule } from './modules/physiotherapist/physiotherapist
             logging: 'all', // remove in prod?
         }),
         FixtureModule,
-        PhysiotherapistModule,
+        UserModule,
+        AuthModule,
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [
+        AppService,
+        {
+            provide: APP_GUARD,
+            useClass: JwtAuthGuard,
+        },
+    ],
 })
 export class AppModule {}
