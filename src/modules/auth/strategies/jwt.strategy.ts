@@ -1,10 +1,16 @@
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PassportStrategy } from '@nestjs/passport'
 import { Injectable } from '@nestjs/common'
+import { UserService } from '../../user/user.service'
+
+export class JwtPayload {
+    sub: number
+    email: string
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor() {
+    constructor(private userService: UserService) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: process.env.ENVIRONMENT === 'local', // ignore expiration for local purposes
@@ -12,9 +18,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         })
     }
 
-    async validate(payload: any) {
-        console.log(payload)
-        // todo lookup user and enrich the returned object directly here like get the list of patients etc.
-        return { userId: payload.id, email: payload.email }
+    async validate(payload: JwtPayload) {
+        const user = await this.userService.findEnrichedUserById(payload.sub)
+        delete user.password
+
+        return user
     }
 }

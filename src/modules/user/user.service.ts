@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common'
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from '../../entities/user.entity'
 import { Repository } from 'typeorm'
@@ -13,9 +13,30 @@ export class UserService {
     ) {}
 
     async findByEmail(email: string): Promise<User> {
-        // todo improve this ? 404 if not found?
-        return this.userRepository.findOne({ where: { email } })
+        const user = await this.userRepository.findOneBy({ email })
+
+        if (!user) {
+            throw new NotFoundException(`User email '${email}' not found`)
+        }
+
+        return user
     }
+
+    async findEnrichedUserById(id: number): Promise<User> {
+        const user = await this.userRepository
+            .createQueryBuilder('user')
+            .leftJoin('user.patients', 'patients')
+            .where('user.id = :id', { id })
+            .select(['user', 'patients.id'])
+            .getOne()
+
+        if (!user) {
+            throw new NotFoundException(`User ID '${id}' not found`)
+        }
+
+        return user
+    }
+
     async signUp(userDto: UserSignUpDto) {
         const { email, password, firstname } = userDto
 

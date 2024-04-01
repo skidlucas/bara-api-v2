@@ -8,9 +8,7 @@ import {
     Unique,
     UpdateDateColumn,
 } from 'typeorm'
-// import * as bcrypt from 'bcryptjs';
 import { Patient } from './patient.entity'
-import { AccessToken } from './access-token.entity'
 
 @Entity()
 @Unique(['email'])
@@ -31,10 +29,10 @@ export class User {
     @Column()
     password: string
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, select: false })
     resetPasswordToken: string
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, select: false })
     resetPasswordTokenExpiresAt: Date
 
     @Column({ default: 'enabled' })
@@ -46,17 +44,7 @@ export class User {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @OneToMany(() => AccessToken, (accessToken) => accessToken.user, {
-        cascade: true,
-    })
-    accessTokens: AccessToken[]
-
     @OneToMany(() => Patient, (patient) => patient.physiotherapist)
     @JoinColumn()
     patients: Patient[]
-
-    async validatePassword(password: string): Promise<boolean> {
-        return true
-        // return bcrypt.compare(password, this.password);
-    }
 }
