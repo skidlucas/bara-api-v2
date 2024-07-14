@@ -8,6 +8,7 @@ import { UserModule } from './modules/user/user.module'
 import { AuthModule } from './modules/auth/auth.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard'
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard'
             ssl: true,
             entities: [__dirname + '/../**/entities/*.entity.js'],
             synchronize: process.env.ENVIRONMENT === 'local',
+            namingStrategy: new SnakeNamingStrategy(),
             logging: 'all', // remove in prod?
         }),
         FixtureModule,

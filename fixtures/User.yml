@@ -1,15 +1,8 @@
 entity: User
-processor: ../dist/fixtures/processors/UserProcessor
 items:
   user1:
-    firstname: Barbara
-    email: barbara@gmail.com
-    password: tototoO0
+    clerkId: user_2ePTOYPUIRhg9RgAD1tln3M8Aeb
   user2:
-    firstname: Alicia
-    email: alicia@gmail.com
-    password: tototoO0
+    clerkId: xxx
   user3:
-    firstname: Valentine
-    email: valentine@gmail.com
-    password: tototoO0
+    clerkId: yyy

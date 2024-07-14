@@ -23,16 +23,16 @@ export class Invoice {
     @Column({ type: 'date', default: () => 'NOW()' })
     date: Date
 
-    @Column()
+    @Column({ default: 0 })
     socialSecurityAmount: number
 
-    @Column()
+    @Column({ default: 0 })
     insuranceAmount: number
 
-    @Column()
+    @Column({ default: false })
     isSocialSecurityPaid: boolean
 
-    @Column()
+    @Column({ default: false })
     isInsurancePaid: boolean
 
     @CreateDateColumn()
@@ -45,7 +45,7 @@ export class Invoice {
     @JoinColumn()
     patient: Patient
 
-    @Column()
+    @Column({nullable: true})
     @RelationId((invoice: Invoice) => invoice.patient)
     patientId: number
 

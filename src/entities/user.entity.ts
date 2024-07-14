@@ -1,17 +1,8 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    Unique,
-    UpdateDateColumn,
-} from 'typeorm'
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm'
 import { Patient } from './patient.entity'
 
 @Entity()
-@Unique(['email'])
+@Unique(['clerkId'])
 export class User {
     constructor(init?: Partial<User>) {
         Object.assign(this, init)
@@ -20,29 +11,29 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
-    email: string
+    @Column({ nullable: true })
+    clerkId: string
 
-    @Column()
-    firstname: string
-
-    @Column()
-    password: string
-
-    @Column({ nullable: true, select: false })
-    resetPasswordToken: string
-
-    @Column({ nullable: true, select: false })
-    resetPasswordTokenExpiresAt: Date
-
-    @Column({ default: 'enabled' })
-    status: string
-
-    @CreateDateColumn()
-    createdAt: Date
-
-    @UpdateDateColumn()
-    updatedAt: Date
+    // @Column()
+    // firstname: string
+    //
+    // @Column()
+    // password: string
+    //
+    // @Column({ nullable: true, select: false })
+    // resetPasswordToken: string
+    //
+    // @Column({ nullable: true, select: false })
+    // resetPasswordTokenExpiresAt: Date
+    //
+    // @Column({ default: 'enabled' })
+    // status: string
+    //
+    // @CreateDateColumn()
+    // createdAt: Date
+    //
+    // @UpdateDateColumn()
+    // updatedAt: Date
 
     @OneToMany(() => Patient, (patient) => patient.physiotherapist)
     @JoinColumn()

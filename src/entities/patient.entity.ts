@@ -62,7 +62,7 @@ export class Patient {
     @JoinColumn()
     physiotherapist: User
 
-    @Column()
+    @Column({nullable: true})
     @RelationId((patient: Patient) => patient.physiotherapist)
     physiotherapistId: number
 
