@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard'
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
+import { InvoiceModule } from './modules/invoice/invoice.module'
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
         FixtureModule,
         UserModule,
         AuthModule,
+        InvoiceModule,
     ],
     controllers: [AppController],
     providers: [

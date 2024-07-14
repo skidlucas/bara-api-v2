@@ -24,13 +24,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             issuer: process.env.CLERK_ISSUER_URL,
             algorithms: ['RS256'],
         })
-        console.log('JwtStrategy initialized')
     }
 
     async validate(payload: JwtPayload) {
         return await this.userService.findEnrichedUserByClerkId(payload.sub)
-        // delete user.password
-
-        // return user
     }
 }

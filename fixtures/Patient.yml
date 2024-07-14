@@ -11,7 +11,7 @@ items:
     zipCode: 13600
     country: FRANCE
     dateOfBirth: '1993-12-26'
-    physiotherapist: '@user1'
+    healthProfessional: '@user1'
     insurance: '@insurance1'
   patient2:
     firstname: Hugo
@@ -24,9 +24,22 @@ items:
     zipCode: 83640
     country: FRANCE
     dateOfBirth: '1989-07-28'
-    physiotherapist: '@user1'
+    healthProfessional: '@user1'
     insurance: '@insurance1'
   patient3:
+    firstname: Denis
+    lastname: TELLENNE
+    gender: M
+    email: denis@gmail.com
+    phone: 0033626912921
+    address: 10 rue de Chose
+    city: Gémenos
+    zipCode: 13420
+    country: FRANCE
+    dateOfBirth: '1984-05-30'
+    healthProfessional: '@user1'
+    insurance: '@insurance2'
+  patient4:
     firstname: Astrid
     lastname: GARZON RODRIGUEZ
     gender: F
@@ -37,5 +50,5 @@ items:
     zipCode: 83640
     country: FRANCE
     dateOfBirth: '1989-04-13'
-    physiotherapist: '@user2'
+    healthProfessional: '@user2'
     insurance: '@insurance2'

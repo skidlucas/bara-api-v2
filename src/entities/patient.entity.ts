@@ -60,11 +60,11 @@ export class Patient {
 
     @ManyToOne(() => User, (user) => user.patients)
     @JoinColumn()
-    physiotherapist: User
+    healthProfessional: User
 
-    @Column({nullable: true})
-    @RelationId((patient: Patient) => patient.physiotherapist)
-    physiotherapistId: number
+    @Column()
+    @RelationId((patient: Patient) => patient.healthProfessional)
+    healthProfessionalId: number
 
     @OneToMany(() => Invoice, (invoice) => invoice.patient)
     @JoinColumn()

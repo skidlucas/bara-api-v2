@@ -14,28 +14,7 @@ export class User {
     @Column({ nullable: true })
     clerkId: string
 
-    // @Column()
-    // firstname: string
-    //
-    // @Column()
-    // password: string
-    //
-    // @Column({ nullable: true, select: false })
-    // resetPasswordToken: string
-    //
-    // @Column({ nullable: true, select: false })
-    // resetPasswordTokenExpiresAt: Date
-    //
-    // @Column({ default: 'enabled' })
-    // status: string
-    //
-    // @CreateDateColumn()
-    // createdAt: Date
-    //
-    // @UpdateDateColumn()
-    // updatedAt: Date
-
-    @OneToMany(() => Patient, (patient) => patient.physiotherapist)
+    @OneToMany(() => Patient, (patient) => patient.healthProfessional)
     @JoinColumn()
     patients: Patient[]
 }

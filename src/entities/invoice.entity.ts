@@ -1,6 +1,7 @@
 import {
     Column,
     CreateDateColumn,
+    DeleteDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
@@ -41,11 +42,14 @@ export class Invoice {
     @UpdateDateColumn()
     updatedAt: Date
 
+    @DeleteDateColumn()
+    deletedAt: Date
+
     @ManyToOne(() => Patient, (patient) => patient.invoices)
     @JoinColumn()
     patient: Patient
 
-    @Column({nullable: true})
+    @Column()
     @RelationId((invoice: Invoice) => invoice.patient)
     patientId: number
 
