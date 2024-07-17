@@ -67,8 +67,8 @@ export class InvoiceService {
         const invoice = new Invoice({
             socialSecurityAmount: Math.floor(socialSecurityAmount * 100),
             insuranceAmount: Math.floor(insuranceAmount * 100),
-            isSocialSecurityPaid,
-            isInsurancePaid,
+            isSocialSecurityPaid: socialSecurityAmount > 0 ? isSocialSecurityPaid : false,
+            isInsurancePaid: insuranceAmount > 0 ? isInsurancePaid : false,
             date,
             patientId,
             insuranceId,
