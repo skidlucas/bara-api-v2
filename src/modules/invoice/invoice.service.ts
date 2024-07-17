@@ -1,9 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { Invoice } from '../../entities/invoice.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { FilterOperator, paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
-import { CreateInvoiceDto } from './invoice.dto'
+import { CreateInvoiceDto, UpdateInvoiceDto } from './invoice.dto'
 import { User } from '../../entities/user.entity'
 
 @Injectable()
@@ -48,7 +48,7 @@ export class InvoiceService {
         })
     }
 
-    async createInvoice(user: User, createInvoiceDto: CreateInvoiceDto): Promise<Invoice> {
+    async createInvoice(user: User, invoiceDto: CreateInvoiceDto): Promise<Invoice> {
         const {
             socialSecurityAmount,
             insuranceAmount,
@@ -57,7 +57,7 @@ export class InvoiceService {
             date,
             patientId,
             insuranceId,
-        } = createInvoiceDto
+        } = invoiceDto
 
         const currentUserPatientIds = user.patients.map((patient) => patient.id)
         if (!currentUserPatientIds.includes(patientId)) {
@@ -73,6 +73,47 @@ export class InvoiceService {
             patientId,
             insuranceId,
         })
+
+        try {
+            return await this.invoiceRepository.save(invoice)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    async updateInvoice(invoiceId: number, user: User, invoiceDto: UpdateInvoiceDto): Promise<Invoice> {
+        const invoice = await this.invoiceRepository.findOneBy({ id: invoiceId })
+
+        if (!invoice) {
+            throw new NotFoundException(`Invoice ${invoiceId} not found`)
+        }
+
+        const {
+            socialSecurityAmount,
+            insuranceAmount,
+            isSocialSecurityPaid,
+            isInsurancePaid,
+            date,
+            patientId,
+            insuranceId,
+        } = invoiceDto
+
+        if (patientId) {
+            const currentUserPatientIds = user.patients.map((patient) => patient.id)
+            if (!currentUserPatientIds.includes(patientId)) {
+                throw new ForbiddenException(`This patient doesn't belong to this user.`)
+            }
+
+            invoice.patientId = patientId
+        }
+
+        if (socialSecurityAmount) invoice.socialSecurityAmount = Math.floor(socialSecurityAmount * 100)
+        if (insuranceAmount) invoice.insuranceAmount = Math.floor(insuranceAmount * 100)
+        if (date) invoice.date = date
+        if (insuranceId) invoice.insuranceId = insuranceId
+        else invoice.insuranceId = null
+        invoice.isSocialSecurityPaid = invoice.socialSecurityAmount > 0 ? isSocialSecurityPaid : false
+        invoice.isInsurancePaid = invoice.insuranceAmount > 0 ? isInsurancePaid : false
 
         try {
             return await this.invoiceRepository.save(invoice)

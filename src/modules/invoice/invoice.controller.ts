@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common'
 import { InvoiceService } from './invoice.service'
 import { User } from '../../entities/user.entity'
 import { UserFromReq } from '../auth/user.decorator'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
-import { CreateInvoiceDto } from './invoice.dto'
+import { CreateInvoiceDto, UpdateInvoiceDto } from './invoice.dto'
 
 @Controller('invoices')
 export class InvoiceController {
@@ -15,7 +15,12 @@ export class InvoiceController {
     }
 
     @Post()
-    createInvoice(@UserFromReq() user: User, @Body() createInvoiceDto: CreateInvoiceDto) {
-        return this.invoiceService.createInvoice(user, createInvoiceDto)
+    createInvoice(@UserFromReq() user: User, @Body() invoiceDto: CreateInvoiceDto) {
+        return this.invoiceService.createInvoice(user, invoiceDto)
+    }
+
+    @Patch(':id')
+    updateInvoice(@UserFromReq() user: User, @Param('id') invoiceId: number, @Body() invoiceDto: UpdateInvoiceDto) {
+        return this.invoiceService.updateInvoice(invoiceId, user, invoiceDto)
     }
 }
