@@ -51,9 +51,9 @@ on:
     branches: [ "master" ]
 
 env:
-  PROJECT_ID: bara # TODO: update Google Cloud project id
-  SERVICE: bara-api-v2 # TODO: update Cloud Run service name
-  REGION: europe-west9 # TODO: update Cloud Run service region
+  PROJECT_ID: bara-api-v2
+  SERVICE: bara-api-v2
+  REGION: europe-west9
 
 jobs:
   deploy:
