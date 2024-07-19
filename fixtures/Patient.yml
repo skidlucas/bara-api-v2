@@ -3,52 +3,20 @@ items:
   patient1:
     firstname: Lucas
     lastname: MARTINEZ
-    gender: M
-    email: lucas@gmail.com
-    phone: 0033626912921
-    address: 33 chemin du Garoutier
-    city: La Ciotat
-    zipCode: 13600
-    country: FRANCE
-    dateOfBirth: '1993-12-26'
     healthProfessional: '@user1'
     insurance: '@insurance1'
   patient2:
     firstname: Hugo
     lastname: MARTINEZ
-    gender: M
-    email: hugo@gmail.com
-    phone: 0033626912921
-    address: 10 rue de Machin
-    city: Saint Zacharie
-    zipCode: 83640
-    country: FRANCE
-    dateOfBirth: '1989-07-28'
     healthProfessional: '@user1'
     insurance: '@insurance1'
   patient3:
     firstname: Denis
     lastname: TELLENNE
-    gender: M
-    email: denis@gmail.com
-    phone: 0033626912921
-    address: 10 rue de Chose
-    city: Gémenos
-    zipCode: 13420
-    country: FRANCE
-    dateOfBirth: '1984-05-30'
     healthProfessional: '@user1'
     insurance: '@insurance2'
   patient4:
     firstname: Astrid
     lastname: GARZON RODRIGUEZ
-    gender: F
-    email: petu@gmail.com
-    phone: 0033626912921
-    address: 10 rue de Machin
-    city: Saint Zacharie
-    zipCode: 83640
-    country: FRANCE
-    dateOfBirth: '1989-04-13'
     healthProfessional: '@user2'
     insurance: '@insurance2'

@@ -2,13 +2,10 @@ entity: Insurance
 items:
   insurance1:
     name: Alan
-    phone: 0442739745
     amcNumber: 123
   insurance2:
     name: Harmonie Mutuelle
-    phone: 0442739745
     amcNumber: 456
   insurance3:
     name: Henner
-    phone: 0442739745
     amcNumber: 789

@@ -28,30 +28,6 @@ export class Patient {
     @Column()
     firstname: string
 
-    @Column({ nullable: true })
-    gender: string
-
-    @Column({ nullable: true })
-    phone: string
-
-    @Column({ nullable: true })
-    email: string
-
-    @Column({ nullable: true })
-    address: string
-
-    @Column({ nullable: true })
-    zipCode: string
-
-    @Column({ nullable: true })
-    city: string
-
-    @Column({ nullable: true })
-    country: string
-
-    @Column('date', { nullable: true })
-    dateOfBirth: Date
-
     @CreateDateColumn()
     createdAt: Date
 
@@ -72,9 +48,9 @@ export class Patient {
 
     @ManyToOne(() => Insurance, (insurance) => insurance.patients)
     @JoinColumn()
-    insurance: Insurance
+    insurance?: Insurance
 
     @Column({ nullable: true })
     @RelationId((patient: Patient) => patient.insurance)
-    insuranceId: number
+    insuranceId?: number
 }

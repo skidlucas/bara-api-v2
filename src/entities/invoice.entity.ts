@@ -55,9 +55,9 @@ export class Invoice {
 
     @ManyToOne(() => Insurance, (insurance) => insurance.invoices)
     @JoinColumn()
-    insurance: Insurance
+    insurance?: Insurance
 
     @Column({ nullable: true })
     @RelationId((invoice: Invoice) => invoice.insurance)
-    insuranceId: number
+    insuranceId?: number
 }

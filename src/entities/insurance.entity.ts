@@ -23,9 +23,6 @@ export class Insurance {
     name: string
 
     @Column({ nullable: true })
-    phone: string
-
-    @Column({ nullable: true })
     amcNumber: string
 
     @CreateDateColumn()
