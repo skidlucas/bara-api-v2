@@ -1,26 +1,40 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common'
 import { InvoiceService } from './invoice.service'
 import { User } from '../../entities/user.entity'
 import { UserFromReq } from '../auth/user.decorator'
-import { Paginate, PaginateQuery } from 'nestjs-paginate'
-import { CreateInvoiceDto, UpdateInvoiceDto } from './invoice.dto'
+import { CreateInvoiceDto, FindInvoicesQueryParams, UpdateInvoiceDto } from './invoice.dto'
+import { CreateRequestContext, MikroORM } from '@mikro-orm/postgresql'
+import { Invoice } from '../../entities/invoice.entity'
 
 @Controller('invoices')
 export class InvoiceController {
-    constructor(private invoiceService: InvoiceService) {}
+    constructor(
+        private invoiceService: InvoiceService,
+        private readonly orm: MikroORM,
+    ) {}
 
     @Get()
-    getInvoices(@UserFromReq() user: User, @Paginate() paginateQuery: PaginateQuery) {
-        return this.invoiceService.getInvoices(user.id, paginateQuery)
+    @CreateRequestContext()
+    async getInvoices(
+        @UserFromReq() user: User,
+        @Query() queryParams: FindInvoicesQueryParams,
+    ): Promise<{ data: Invoice[]; totalItems: number }> {
+        return await this.invoiceService.getInvoices(user.id, queryParams)
     }
 
     @Post()
-    createInvoice(@UserFromReq() user: User, @Body() invoiceDto: CreateInvoiceDto) {
-        return this.invoiceService.createInvoice(user, invoiceDto)
+    @CreateRequestContext()
+    async createInvoice(@UserFromReq() user: User, @Body() invoiceDto: CreateInvoiceDto): Promise<Invoice> {
+        return await this.invoiceService.createInvoice(user, invoiceDto)
     }
 
     @Patch(':id')
-    updateInvoice(@UserFromReq() user: User, @Param('id') invoiceId: number, @Body() invoiceDto: UpdateInvoiceDto) {
-        return this.invoiceService.updateInvoice(invoiceId, user, invoiceDto)
+    @CreateRequestContext()
+    async updateInvoice(
+        @UserFromReq() user: User,
+        @Param('id') invoiceId: number,
+        @Body() invoiceDto: UpdateInvoiceDto,
+    ) {
+        return await this.invoiceService.updateInvoice(invoiceId, user, invoiceDto)
     }
 }

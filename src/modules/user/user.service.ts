@@ -1,27 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { Injectable } from '@nestjs/common'
 import { User } from '../../entities/user.entity'
-import { Repository } from 'typeorm'
+import { InjectRepository } from '@mikro-orm/nestjs'
+import { CreateRequestContext, EntityRepository, MikroORM } from '@mikro-orm/postgresql'
 
 @Injectable()
 export class UserService {
     constructor(
+        private readonly orm: MikroORM,
         @InjectRepository(User)
-        private userRepository: Repository<User>,
+        private userRepository: EntityRepository<User>,
     ) {}
 
+    @CreateRequestContext()
     async findEnrichedUserByClerkId(clerkId: string): Promise<User> {
-        const user = await this.userRepository
-            .createQueryBuilder('user')
-            .leftJoin('user.patients', 'patients')
-            .where('user.clerkId = :clerkId', { clerkId })
-            .select(['user', 'patients.id'])
-            .getOne()
-
-        if (!user) {
-            throw new NotFoundException(`User with Clerk ID '${clerkId}' not found`)
-        }
-
-        return user
+        return await this.userRepository.findOneOrFail({ clerkId }, { populate: ['patients'] })
     }
 }

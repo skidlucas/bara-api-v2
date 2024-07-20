@@ -1,20 +1,17 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { Collection, Entity, OneToMany, Property } from '@mikro-orm/postgresql'
 import { Patient } from './patient.entity'
+import { BaseEntity } from './base.entity'
 
 @Entity()
-@Unique(['clerkId'])
-export class User {
+export class User extends BaseEntity {
     constructor(init?: Partial<User>) {
+        super()
         Object.assign(this, init)
     }
 
-    @PrimaryGeneratedColumn()
-    id: number
-
-    @Column({ nullable: true })
-    clerkId: string
+    @Property({ unique: true })
+    clerkId?: string
 
     @OneToMany(() => Patient, (patient) => patient.healthProfessional)
-    @JoinColumn()
-    patients: Patient[]
+    patients = new Collection<Patient>(this)
 }

@@ -1,41 +1,24 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm'
 import { Patient } from './patient.entity'
 import { Invoice } from './invoice.entity'
+import { Collection, Entity, OneToMany, Property } from '@mikro-orm/postgresql'
+import { BaseEntity } from './base.entity'
 
 @Entity()
-export class Insurance {
+export class Insurance extends BaseEntity {
     constructor(init?: Partial<Insurance>) {
+        super()
         Object.assign(this, init)
     }
 
-    @PrimaryGeneratedColumn()
-    id: number
+    @Property()
+    name!: string
 
-    @Column()
-    name: string
-
-    @Column({ nullable: true })
-    amcNumber: string
-
-    @CreateDateColumn()
-    createdAt: Date
-
-    @UpdateDateColumn()
-    updatedAt: Date
+    @Property({ nullable: true })
+    amcNumber?: string
 
     @OneToMany(() => Patient, (patient) => patient.insurance)
-    @JoinColumn()
-    patients: Patient[]
+    patients = new Collection<Patient>(this)
 
     @OneToMany(() => Invoice, (invoice) => invoice.insurance)
-    @JoinColumn()
-    invoices: Invoice[]
+    invoices = new Collection<Invoice>(this)
 }

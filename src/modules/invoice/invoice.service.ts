@@ -1,31 +1,47 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { Invoice } from '../../entities/invoice.entity'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { FilterOperator, paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
-import { CreateInvoiceDto, UpdateInvoiceDto } from './invoice.dto'
+import { CreateInvoiceDto, FindInvoicesQueryParams, UpdateInvoiceDto } from './invoice.dto'
+import { EntityManager, QueryOrder } from '@mikro-orm/postgresql'
 import { User } from '../../entities/user.entity'
+import { Patient } from '../../entities/patient.entity'
+import { Insurance } from '../../entities/insurance.entity'
 
 @Injectable()
 export class InvoiceService {
     constructor(
-        @InjectRepository(Invoice)
-        private invoiceRepository: Repository<Invoice>,
+        private readonly em: EntityManager,
         // private patientsService: PatientsService,
         // private insurancesService: InsurancesService,
     ) {}
 
-    async getInvoices(userId: number, paginateQuery: PaginateQuery): Promise<Paginated<Invoice>> {
-        return paginate(paginateQuery, this.invoiceRepository, {
-            relations: ['patient', 'insurance'],
-            where: {
-                patient: { healthProfessionalId: userId },
-            },
-            sortableColumns: ['id', 'date'],
-            nullSort: 'last',
-            defaultSortBy: [['date', 'DESC']],
-            searchableColumns: ['patient.firstname', 'patient.lastname', 'insurance.name'],
-            select: [
+    async getInvoices(
+        userId: number,
+        queryParams: FindInvoicesQueryParams,
+    ): Promise<{ data: Invoice[]; totalItems: number }> {
+        const { limit, page, search, unpaid } = queryParams
+
+        const where: any = { patient: { healthProfessional: { id: userId } } }
+
+        if (search) {
+            const ilikeSearch = { $ilike: `%${search}%` }
+            where.patient.$or = [{ firstname: ilikeSearch }, { lastname: ilikeSearch }]
+        }
+
+        if (unpaid) {
+            if (unpaid === 'socialSecurity') {
+                where.isSocialSecurityPaid = false
+                where.socialSecurityAmount = { $gt: 0 }
+            } else if (unpaid === 'insurance') {
+                where.isInsurancePaid = false
+                where.insuranceAmount = { $gt: 0 }
+            }
+        }
+
+        const [invoices, count] = await this.em.findAndCount(Invoice, where, {
+            limit: limit,
+            offset: limit * (page - 1),
+            populate: ['patient', 'insurance'],
+            fields: [
                 'id',
                 'date',
                 'socialSecurityAmount',
@@ -39,13 +55,10 @@ export class InvoiceService {
                 'insurance.id',
                 'insurance.name',
             ],
-            filterableColumns: {
-                isSocialSecurityPaid: [FilterOperator.EQ],
-                socialSecurityAmount: [FilterOperator.GT],
-                isInsurancePaid: [FilterOperator.EQ],
-                insuranceAmount: [FilterOperator.GT],
-            },
+            orderBy: { date: QueryOrder.DESC, id: QueryOrder.DESC },
         })
+
+        return { data: invoices as Invoice[], totalItems: count }
     }
 
     async createInvoice(user: User, invoiceDto: CreateInvoiceDto): Promise<Invoice> {
@@ -70,19 +83,20 @@ export class InvoiceService {
             isSocialSecurityPaid: socialSecurityAmount > 0 ? isSocialSecurityPaid : false,
             isInsurancePaid: insuranceAmount > 0 ? isInsurancePaid : false,
             date,
-            patientId,
-            insuranceId,
+            patient: this.em.getReference(Patient, patientId),
+            insurance: insuranceId ? this.em.getReference(Insurance, insuranceId) : null,
         })
 
         try {
-            return await this.invoiceRepository.save(invoice)
+            await this.em.persistAndFlush(invoice)
+            return invoice
         } catch (err) {
             console.error(err)
         }
     }
 
     async updateInvoice(invoiceId: number, user: User, invoiceDto: UpdateInvoiceDto): Promise<Invoice> {
-        const invoice = await this.invoiceRepository.findOneBy({ id: invoiceId })
+        const invoice = await this.em.findOne(Invoice, { id: invoiceId })
 
         if (!invoice) {
             throw new NotFoundException(`Invoice ${invoiceId} not found`)
@@ -104,19 +118,20 @@ export class InvoiceService {
                 throw new ForbiddenException(`This patient doesn't belong to this user.`)
             }
 
-            invoice.patientId = patientId
+            invoice.patient = this.em.getReference(Patient, patientId)
         }
 
         if (socialSecurityAmount) invoice.socialSecurityAmount = Math.floor(socialSecurityAmount * 100)
         if (insuranceAmount) invoice.insuranceAmount = Math.floor(insuranceAmount * 100)
         if (date) invoice.date = date
-        if (insuranceId) invoice.insuranceId = insuranceId
-        else invoice.insuranceId = null
-        invoice.isSocialSecurityPaid = invoice.socialSecurityAmount > 0 ? isSocialSecurityPaid : false
-        invoice.isInsurancePaid = invoice.insuranceAmount > 0 ? isInsurancePaid : false
+        if (insuranceId) invoice.insurance = this.em.getReference(Insurance, insuranceId)
+        else invoice.insurance = null
+        invoice.isSocialSecurityPaid = invoice.socialSecurityAmount > 0 ? !!isSocialSecurityPaid : false
+        invoice.isInsurancePaid = invoice.insuranceAmount > 0 ? !!isInsurancePaid : false
 
         try {
-            return await this.invoiceRepository.save(invoice)
+            await this.em.persistAndFlush(invoice)
+            return invoice
         } catch (err) {
             console.error(err)
         }

@@ -1,63 +1,36 @@
-import {
-    Column,
-    CreateDateColumn,
-    DeleteDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    RelationId,
-    UpdateDateColumn,
-} from 'typeorm'
 import { Patient } from './patient.entity'
 import { Insurance } from './insurance.entity'
+import { Entity, ManyToOne, Property } from '@mikro-orm/postgresql'
+import { BaseEntity } from './base.entity'
 
 @Entity()
-export class Invoice {
+export class Invoice extends BaseEntity {
     constructor(init?: Partial<Invoice>) {
+        super()
         Object.assign(this, init)
     }
 
-    @PrimaryGeneratedColumn()
-    id: number
+    @Property()
+    date!: Date
 
-    @Column({ type: 'date', default: () => 'NOW()' })
-    date: Date
+    @Property()
+    socialSecurityAmount: number = 0
 
-    @Column({ default: 0 })
-    socialSecurityAmount: number
+    @Property()
+    insuranceAmount: number = 0
 
-    @Column({ default: 0 })
-    insuranceAmount: number
+    @Property()
+    isSocialSecurityPaid: boolean = false
 
-    @Column({ default: false })
-    isSocialSecurityPaid: boolean
+    @Property()
+    isInsurancePaid: boolean = false
 
-    @Column({ default: false })
-    isInsurancePaid: boolean
+    @Property()
+    deleted: boolean = false
 
-    @CreateDateColumn()
-    createdAt: Date
+    @ManyToOne()
+    patient!: Patient
 
-    @UpdateDateColumn()
-    updatedAt: Date
-
-    @DeleteDateColumn()
-    deletedAt: Date
-
-    @ManyToOne(() => Patient, (patient) => patient.invoices)
-    @JoinColumn()
-    patient: Patient
-
-    @Column()
-    @RelationId((invoice: Invoice) => invoice.patient)
-    patientId: number
-
-    @ManyToOne(() => Insurance, (insurance) => insurance.invoices)
-    @JoinColumn()
+    @ManyToOne()
     insurance?: Insurance
-
-    @Column({ nullable: true })
-    @RelationId((invoice: Invoice) => invoice.insurance)
-    insuranceId?: number
 }

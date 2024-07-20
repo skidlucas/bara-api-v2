@@ -1,56 +1,28 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    RelationId,
-    UpdateDateColumn,
-} from 'typeorm'
 import { User } from './user.entity'
 import { Invoice } from './invoice.entity'
 import { Insurance } from './insurance.entity'
+import { Collection, Entity, ManyToOne, OneToMany, Property } from '@mikro-orm/postgresql'
+import { BaseEntity } from './base.entity'
 
 @Entity()
-export class Patient {
+export class Patient extends BaseEntity {
     constructor(init?: Partial<Patient>) {
+        super()
         Object.assign(this, init)
     }
 
-    @PrimaryGeneratedColumn()
-    id: number
+    @Property()
+    lastname!: string
 
-    @Column()
-    lastname: string
+    @Property()
+    firstname!: string
 
-    @Column()
-    firstname: string
-
-    @CreateDateColumn()
-    createdAt: Date
-
-    @UpdateDateColumn()
-    updatedAt: Date
-
-    @ManyToOne(() => User, (user) => user.patients)
-    @JoinColumn()
-    healthProfessional: User
-
-    @Column()
-    @RelationId((patient: Patient) => patient.healthProfessional)
-    healthProfessionalId: number
+    @ManyToOne()
+    healthProfessional!: User
 
     @OneToMany(() => Invoice, (invoice) => invoice.patient)
-    @JoinColumn()
-    invoices: Invoice[]
+    invoices = new Collection<Invoice>(this)
 
-    @ManyToOne(() => Insurance, (insurance) => insurance.patients)
-    @JoinColumn()
+    @ManyToOne()
     insurance?: Insurance
-
-    @Column({ nullable: true })
-    @RelationId((patient: Patient) => patient.insurance)
-    insuranceId?: number
 }

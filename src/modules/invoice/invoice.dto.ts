@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsISO8601, IsNumber, IsOptional } from 'class-validator'
+import { IsBoolean, IsInt, IsISO8601, IsNumber, IsNumberString, IsOptional, IsString } from 'class-validator'
 
 export class CreateInvoiceDto {
     @IsNumber()
@@ -52,4 +52,20 @@ export class UpdateInvoiceDto {
     @IsInt()
     @IsOptional()
     insuranceId?: number
+}
+
+export class FindInvoicesQueryParams {
+    @IsNumberString()
+    page: number
+
+    @IsNumberString()
+    limit: number
+
+    @IsString()
+    @IsOptional()
+    search?: string
+
+    @IsString()
+    @IsOptional()
+    unpaid?: string
 }
