@@ -3,6 +3,7 @@ import { TsMorphMetadataProvider } from '@mikro-orm/reflection'
 import { Migrator } from '@mikro-orm/migrations'
 import { SeedManager } from '@mikro-orm/seeder'
 import { defineConfig } from '@mikro-orm/postgresql'
+import { SoftDeleteHandler } from 'mikro-orm-soft-delete'
 
 export default defineConfig({
     host: process.env.MIKRO_ORM_HOST,
@@ -20,5 +21,5 @@ export default defineConfig({
     metadataProvider: TsMorphMetadataProvider,
     // @ts-expect-error nestjs adapter option
     registerRequestContext: false,
-    extensions: [Migrator, SeedManager],
+    extensions: [Migrator, SeedManager, SoftDeleteHandler],
 })

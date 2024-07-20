@@ -72,10 +72,7 @@ export class InvoiceService {
             insuranceId,
         } = invoiceDto
 
-        const currentUserPatientIds = user.patients.map((patient) => patient.id)
-        if (!currentUserPatientIds.includes(patientId)) {
-            throw new ForbiddenException(`This patient doesn't belong to this user.`)
-        }
+        this.checkIfPatientBelongsToUserOrThrowError(user, patientId)
 
         const invoice = new Invoice({
             socialSecurityAmount: Math.floor(socialSecurityAmount * 100),
@@ -113,10 +110,7 @@ export class InvoiceService {
         } = invoiceDto
 
         if (patientId) {
-            const currentUserPatientIds = user.patients.map((patient) => patient.id)
-            if (!currentUserPatientIds.includes(patientId)) {
-                throw new ForbiddenException(`This patient doesn't belong to this user.`)
-            }
+            this.checkIfPatientBelongsToUserOrThrowError(user, patientId)
 
             invoice.patient = this.em.getReference(Patient, patientId)
         }
@@ -124,16 +118,49 @@ export class InvoiceService {
         if (socialSecurityAmount) invoice.socialSecurityAmount = Math.floor(socialSecurityAmount * 100)
         if (insuranceAmount) invoice.insuranceAmount = Math.floor(insuranceAmount * 100)
         if (date) invoice.date = date
-        if (insuranceId) invoice.insurance = this.em.getReference(Insurance, insuranceId)
-        else invoice.insurance = null
-        invoice.isSocialSecurityPaid = invoice.socialSecurityAmount > 0 ? !!isSocialSecurityPaid : false
-        invoice.isInsurancePaid = invoice.insuranceAmount > 0 ? !!isInsurancePaid : false
+
+        if (insuranceId) {
+            invoice.insurance = this.em.getReference(Insurance, insuranceId)
+        } else {
+            invoice.insurance = null
+        }
+
+        if (isSocialSecurityPaid !== undefined) {
+            invoice.isSocialSecurityPaid = invoice.socialSecurityAmount > 0 ? !!isSocialSecurityPaid : false
+        }
+
+        if (isInsurancePaid !== undefined) {
+            invoice.isInsurancePaid = invoice.insuranceAmount > 0 ? !!isInsurancePaid : false
+        }
 
         try {
             await this.em.persistAndFlush(invoice)
             return invoice
         } catch (err) {
             console.error(err)
+        }
+    }
+
+    async deleteInvoice(invoiceId: number, user: User): Promise<void> {
+        const invoice = await this.em.findOne(Invoice, { id: invoiceId }, { populate: ['patient'] })
+
+        if (!invoice) {
+            throw new NotFoundException(`Invoice ${invoiceId} not found`)
+        }
+
+        this.checkIfPatientBelongsToUserOrThrowError(user, invoice.patient.id)
+
+        try {
+            await this.em.removeAndFlush(invoice)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    checkIfPatientBelongsToUserOrThrowError(user: User, patientId: number) {
+        const currentUserPatientIds = user.patients.map((patient) => patient.id)
+        if (!currentUserPatientIds.includes(patientId)) {
+            throw new ForbiddenException(`This patient doesn't belong to this user.`)
         }
     }
 }

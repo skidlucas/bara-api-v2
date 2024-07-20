@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
 import { InvoiceService } from './invoice.service'
 import { User } from '../../entities/user.entity'
 import { UserFromReq } from '../auth/user.decorator'
@@ -34,7 +34,13 @@ export class InvoiceController {
         @UserFromReq() user: User,
         @Param('id') invoiceId: number,
         @Body() invoiceDto: UpdateInvoiceDto,
-    ) {
+    ): Promise<Invoice> {
         return await this.invoiceService.updateInvoice(invoiceId, user, invoiceDto)
+    }
+
+    @Delete(':id')
+    @CreateRequestContext()
+    async deleteInvoice(@UserFromReq() user: User, @Param('id') invoiceId: number): Promise<void> {
+        return await this.invoiceService.deleteInvoice(invoiceId, user)
     }
 }

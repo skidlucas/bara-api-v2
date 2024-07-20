@@ -18,6 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "schema:create": "mikro-orm schema:create --dump",
     "seed": "mikro-orm seeder:run",
     "gcloud:deploy": "gcloud run deploy bara-api-v2 --source .",
     "firebase:deploy": "firebase deploy --only hosting --project bara"
@@ -41,6 +42,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "jwks-rsa": "^3.1.0",
+    "mikro-orm-soft-delete": "^1.0.0-alpha.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.3",
