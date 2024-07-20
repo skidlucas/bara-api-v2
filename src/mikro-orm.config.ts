@@ -5,11 +5,11 @@ import { SeedManager } from '@mikro-orm/seeder'
 import { defineConfig } from '@mikro-orm/postgresql'
 
 export default defineConfig({
-    host: process.env.PGHOST,
-    // port: process.env.PGPORT,
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-    dbName: process.env.PGDATABASE,
+    host: process.env.MIKRO_ORM_HOST,
+    // port: parseInt(process.env.MIKRO_ORM_PORT),
+    user: process.env.MIKRO_ORM_USER,
+    password: process.env.MIKRO_ORM_PASSWORD,
+    dbName: process.env.MIKRO_ORM_DB_NAME,
     driverOptions: {
         connection: { ssl: true },
     },
