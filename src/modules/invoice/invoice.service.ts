@@ -119,9 +119,9 @@ export class InvoiceService {
         if (insuranceAmount) invoice.insuranceAmount = Math.floor(insuranceAmount * 100)
         if (date) invoice.date = date
 
-        if (insuranceId) {
+        if (insuranceId > 0) {
             invoice.insurance = this.em.getReference(Insurance, insuranceId)
-        } else {
+        } else if (insuranceId === 0) {
             invoice.insurance = null
         }
 
