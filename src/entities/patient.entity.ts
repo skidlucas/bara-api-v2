@@ -1,10 +1,11 @@
 import { User } from './user.entity'
 import { Invoice } from './invoice.entity'
 import { Insurance } from './insurance.entity'
-import { Collection, Entity, ManyToOne, OneToMany, Property } from '@mikro-orm/postgresql'
+import { Collection, Entity, ManyToOne, OneToMany, Property, Unique } from '@mikro-orm/postgresql'
 import { BaseEntity } from './base.entity'
 
 @Entity()
+@Unique({ properties: ['firstname', 'lastname', 'healthProfessional'] })
 export class Patient extends BaseEntity {
     constructor(init?: Partial<Patient>) {
         super()
@@ -12,10 +13,10 @@ export class Patient extends BaseEntity {
     }
 
     @Property()
-    lastname!: string
+    firstname!: string
 
     @Property()
-    firstname!: string
+    lastname!: string
 
     @ManyToOne()
     healthProfessional!: User

@@ -10,7 +10,7 @@ export class Insurance extends BaseEntity {
         Object.assign(this, init)
     }
 
-    @Property()
+    @Property({ unique: true })
     name!: string
 
     @Property({ nullable: true })

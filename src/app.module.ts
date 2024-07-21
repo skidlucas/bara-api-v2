@@ -9,6 +9,8 @@ import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard'
 import { InvoiceModule } from './modules/invoice/invoice.module'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
+import { InsuranceModule } from './modules/insurance/insurance.module'
+import { PatientModule } from './modules/patient/patient.module'
 
 @Module({
     imports: [
@@ -18,6 +20,8 @@ import { MikroOrmModule } from '@mikro-orm/nestjs'
         UserModule,
         AuthModule,
         InvoiceModule,
+        InsuranceModule,
+        PatientModule,
     ],
     controllers: [AppController],
     providers: [
