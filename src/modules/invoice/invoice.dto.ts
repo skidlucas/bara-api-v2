@@ -1,4 +1,14 @@
-import { IsBoolean, IsInt, IsISO8601, IsNumber, IsNumberString, IsOptional, IsString } from 'class-validator'
+import {
+    IsArray,
+    IsBoolean,
+    IsEnum,
+    IsInt,
+    IsISO8601,
+    IsNumber,
+    IsNumberString,
+    IsOptional,
+    IsString,
+} from 'class-validator'
 
 export class CreateInvoiceDto {
     @IsNumber()
@@ -68,4 +78,12 @@ export class FindInvoicesQueryParams {
     @IsString()
     @IsOptional()
     unpaid?: string
+}
+
+export class TogglePaymentDto {
+    @IsArray()
+    invoiceIds: number[]
+
+    @IsEnum(['socialSecurity', 'insurance'])
+    paymentType: 'socialSecurity' | 'insurance'
 }

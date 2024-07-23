@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestj
 import { InvoiceService } from './invoice.service'
 import { User } from '../../entities/user.entity'
 import { UserFromReq } from '../auth/user.decorator'
-import { CreateInvoiceDto, FindInvoicesQueryParams, UpdateInvoiceDto } from './invoice.dto'
+import { CreateInvoiceDto, FindInvoicesQueryParams, TogglePaymentDto, UpdateInvoiceDto } from './invoice.dto'
 import { CreateRequestContext, MikroORM } from '@mikro-orm/postgresql'
 import { Invoice } from '../../entities/invoice.entity'
 
@@ -26,6 +26,12 @@ export class InvoiceController {
     @CreateRequestContext()
     async createInvoice(@UserFromReq() user: User, @Body() invoiceDto: CreateInvoiceDto): Promise<Invoice> {
         return await this.invoiceService.createInvoice(user, invoiceDto)
+    }
+
+    @Patch('toggle-payment')
+    @CreateRequestContext()
+    async toggleInvoicesPayment(@Body() togglePaymentDto: TogglePaymentDto): Promise<void> {
+        await this.invoiceService.toggleInvoicesPayment(togglePaymentDto)
     }
 
     @Patch(':id')

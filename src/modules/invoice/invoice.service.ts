@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { Invoice } from '../../entities/invoice.entity'
-import { CreateInvoiceDto, FindInvoicesQueryParams, UpdateInvoiceDto } from './invoice.dto'
+import { CreateInvoiceDto, FindInvoicesQueryParams, TogglePaymentDto, UpdateInvoiceDto } from './invoice.dto'
 import { EntityManager, QueryOrder } from '@mikro-orm/postgresql'
 import { User } from '../../entities/user.entity'
 import { Patient } from '../../entities/patient.entity'
@@ -152,6 +152,31 @@ export class InvoiceService {
 
         try {
             await this.em.removeAndFlush(invoice)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    async toggleInvoicesPayment(togglePaymentDto: TogglePaymentDto): Promise<void> {
+        const { invoiceIds, paymentType } = togglePaymentDto
+        const invoices = await this.em.find(Invoice, { id: { $in: invoiceIds } })
+
+        if (!invoices.length) {
+            throw new NotFoundException(`Invoices ${invoiceIds.join(',')} not found`)
+        }
+
+        if (paymentType === 'socialSecurity') {
+            for (const invoice of invoices) {
+                invoice.isSocialSecurityPaid = !invoice.isSocialSecurityPaid
+            }
+        } else if (paymentType === 'insurance') {
+            for (const invoice of invoices) {
+                invoice.isInsurancePaid = !invoice.isInsurancePaid
+            }
+        }
+
+        try {
+            await this.em.persistAndFlush(invoices)
         } catch (err) {
             console.error(err)
         }
