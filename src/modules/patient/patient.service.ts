@@ -27,8 +27,8 @@ export class PatientService {
             limit: limit,
             offset: limit * (page - 1),
             populate: ['insurance'],
-            fields: ['id', 'firstname', 'lastname'],
-            orderBy: { lastname: QueryOrder.ASC },
+            fields: ['id', 'firstname', 'lastname', 'insurance.name'],
+            orderBy: { lastname: QueryOrder.ASC, firstname: QueryOrder.ASC },
         })
 
         return { data: patients as Patient[], totalItems: count }

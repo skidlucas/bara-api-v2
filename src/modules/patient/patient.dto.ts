@@ -7,7 +7,6 @@ export class CreatePatientDto {
     @IsString()
     lastname: string
 
-    @IsNumberString()
     @IsOptional()
     insuranceId?: number
 }
