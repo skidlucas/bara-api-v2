@@ -1,6 +1,6 @@
 import { IsNumberString, IsOptional, IsString } from 'class-validator'
 
-export class CreatePatientDto {
+export class PatientDto {
     @IsString()
     firstname: string
 

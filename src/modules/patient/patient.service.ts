@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { EntityManager, QueryOrder } from '@mikro-orm/postgresql'
-import { CreatePatientDto, FindPatientsQueryParams } from './patient.dto'
+import { FindPatientsQueryParams, PatientDto } from './patient.dto'
 import { Patient } from '../../entities/patient.entity'
 import { Insurance } from '../../entities/insurance.entity'
 import { User } from '../../entities/user.entity'
@@ -34,7 +34,7 @@ export class PatientService {
         return { data: patients as Patient[], totalItems: count }
     }
 
-    async createPatient(userId: number, patientDto: CreatePatientDto): Promise<Patient> {
+    async createPatient(userId: number, patientDto: PatientDto): Promise<Patient> {
         const { firstname, lastname, insuranceId } = patientDto
 
         const patient = new Patient({
@@ -43,6 +43,31 @@ export class PatientService {
             healthProfessional: this.em.getReference(User, userId),
             insurance: insuranceId ? this.em.getReference(Insurance, insuranceId) : null,
         })
+
+        try {
+            await this.em.persistAndFlush(patient)
+            return patient
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    async updatePatient(patientId: number, userId: number, patientDto: PatientDto): Promise<Patient> {
+        const patient = await this.em.findOne(Patient, { id: patientId, healthProfessional: { id: userId } })
+
+        if (!patient) {
+            throw new NotFoundException(`Patient ${patientId} not found`)
+        }
+
+        const { firstname, lastname, insuranceId } = patientDto
+
+        patient.firstname = firstname
+        patient.lastname = lastname
+        if (insuranceId > 0) {
+            patient.insurance = this.em.getReference(Insurance, insuranceId)
+        } else if (insuranceId === 0) {
+            patient.insurance = null
+        }
 
         try {
             await this.em.persistAndFlush(patient)

@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common'
 import { CreateRequestContext, MikroORM } from '@mikro-orm/postgresql'
 import { PatientService } from './patient.service'
 import { UserFromReq } from '../auth/user.decorator'
 import { User } from '../../entities/user.entity'
 import { Patient } from '../../entities/patient.entity'
-import { CreatePatientDto, FindPatientsQueryParams } from './patient.dto'
+import { FindPatientsQueryParams, PatientDto } from './patient.dto'
 
 @Controller('patients')
 export class PatientController {
@@ -24,7 +24,17 @@ export class PatientController {
 
     @Post()
     @CreateRequestContext()
-    async createPatient(@UserFromReq() user: User, @Body() patientDto: CreatePatientDto): Promise<Patient> {
+    async createPatient(@UserFromReq() user: User, @Body() patientDto: PatientDto): Promise<Patient> {
         return await this.patientService.createPatient(user.id, patientDto)
+    }
+
+    @Patch(':id')
+    @CreateRequestContext()
+    async updatePatient(
+        @UserFromReq() user: User,
+        @Param('id') patientId: number,
+        @Body() patientDto: PatientDto,
+    ): Promise<Patient> {
+        return await this.patientService.updatePatient(patientId, user.id, patientDto)
     }
 }
