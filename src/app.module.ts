@@ -11,6 +11,7 @@ import { InvoiceModule } from './modules/invoice/invoice.module'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { InsuranceModule } from './modules/insurance/insurance.module'
 import { PatientModule } from './modules/patient/patient.module'
+import { StatisticsModule } from './modules/statistics/statistics.module'
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { PatientModule } from './modules/patient/patient.module'
         InvoiceModule,
         InsuranceModule,
         PatientModule,
+        StatisticsModule,
     ],
     controllers: [AppController],
     providers: [
