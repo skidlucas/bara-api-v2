@@ -8,7 +8,7 @@ export class InvoiceSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
         em.create(Invoice, {
             id: 1,
-            date: '2021-02-23',
+            date: '2024-02-23',
             socialSecurityAmount: 5500,
             insuranceAmount: 8500,
             isSocialSecurityPaid: true,
@@ -19,7 +19,7 @@ export class InvoiceSeeder extends Seeder {
 
         em.create(Invoice, {
             id: 2,
-            date: '2021-02-17',
+            date: '2024-02-17',
             socialSecurityAmount: 5500,
             insuranceAmount: 8500,
             isSocialSecurityPaid: true,
@@ -30,7 +30,7 @@ export class InvoiceSeeder extends Seeder {
 
         em.create(Invoice, {
             id: 3,
-            date: '2021-02-25',
+            date: '2024-02-25',
             socialSecurityAmount: 5500,
             insuranceAmount: 0,
             isSocialSecurityPaid: false,
