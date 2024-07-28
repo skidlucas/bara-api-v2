@@ -3,7 +3,7 @@ import { CreateRequestContext, MikroORM } from '@mikro-orm/postgresql'
 import { UserFromReq } from '../auth/user.decorator'
 import { User } from '../../entities/user.entity'
 import { StatisticsService } from './statistics.service'
-import { DashboardQueryParams } from './statistics.dto'
+import { DashboardQueryParams, MetricsByMonth } from './statistics.dto'
 
 @Controller('statistics')
 export class StatisticsController {
@@ -17,7 +17,12 @@ export class StatisticsController {
     async getInvoices(
         @UserFromReq() user: User,
         @Query() queryParams: DashboardQueryParams,
-    ): Promise<{ totalReceivedThisMonth: number; totalLeftThisMonth: number; total: number }> {
+    ): Promise<{
+        totalReceivedThisMonth: number
+        totalLeftThisMonth: number
+        total: number
+        metricsByMonth: MetricsByMonth[]
+    }> {
         return await this.statsService.getDashboardNumbers(user.id, queryParams)
     }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { EntityManager } from '@mikro-orm/postgresql'
-import { DashboardQueryParams } from './statistics.dto'
+import { DashboardQueryParams, MetricsByMonth } from './statistics.dto'
 
 interface DashboardQueryResult {
     month: string
@@ -18,10 +18,15 @@ export class StatisticsService {
     async getDashboardNumbers(
         userId: number,
         queryParams: DashboardQueryParams,
-    ): Promise<{ totalReceivedThisMonth: number; totalLeftThisMonth: number; total: number }> {
+    ): Promise<{
+        totalReceivedThisMonth: number
+        totalLeftThisMonth: number
+        total: number
+        metricsByMonth: MetricsByMonth[]
+    }> {
         const { from, to } = queryParams
 
-        const res: DashboardQueryResult[] = await this.em.getDriver().execute(
+        const queryResults: DashboardQueryResult[] = await this.em.getDriver().execute(
             `WITH invoice_totals AS (
                             SELECT 
                                 TO_CHAR(DATE_TRUNC('month', i.date), 'YYYY-MM') AS month,
@@ -53,31 +58,38 @@ export class StatisticsService {
             [from, to, userId],
         )
 
+        const metricsByMonth: MetricsByMonth[] = []
+        for (const row of queryResults) {
+            metricsByMonth.push({
+                month: row.month,
+                total_social_security_paid: parseInt(row.total_social_security_paid, 10) / 100,
+                total_social_security_unpaid: parseInt(row.total_social_security_unpaid, 10) / 100,
+                total_insurance_paid: parseInt(row.total_insurance_paid, 10) / 100,
+                total_insurance_unpaid: parseInt(row.total_insurance_unpaid, 10) / 100,
+                total_paid_cumulative: parseInt(row.total_paid_cumulative, 10) / 100,
+            })
+        }
+
         const currentMonth = new Date().toISOString().slice(0, 7) // format YYYY-MM like the SQL result
-        const currentMonthData = res.find((row) => row.month === currentMonth)
+        const currentMonthData = metricsByMonth.find((row) => row.month === currentMonth)
 
         let totalReceivedThisMonth = 0,
             totalLeftThisMonth = 0,
             total = 0
         if (currentMonthData) {
-            totalReceivedThisMonth =
-                (parseInt(currentMonthData.total_insurance_paid, 10) +
-                    parseInt(currentMonthData.total_social_security_paid, 10)) /
-                100
-            totalLeftThisMonth =
-                (parseInt(currentMonthData.total_insurance_unpaid, 10) +
-                    parseInt(currentMonthData.total_social_security_unpaid, 10)) /
-                100
+            totalReceivedThisMonth = currentMonthData.total_insurance_paid + currentMonthData.total_social_security_paid
+            totalLeftThisMonth = currentMonthData.total_insurance_unpaid + currentMonthData.total_social_security_unpaid
         }
 
-        if (res.length) {
-            total = parseInt(res[0].total_paid_cumulative, 10) / 100
+        if (metricsByMonth.length) {
+            total = metricsByMonth[0].total_paid_cumulative
         }
 
         return {
             totalReceivedThisMonth,
             totalLeftThisMonth,
             total,
+            metricsByMonth,
         }
     }
 }
