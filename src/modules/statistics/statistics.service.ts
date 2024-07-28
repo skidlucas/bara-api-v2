@@ -82,7 +82,7 @@ export class StatisticsService {
         }
 
         if (metricsByMonth.length) {
-            total = metricsByMonth[0].total_paid_cumulative
+            total = metricsByMonth[metricsByMonth.length - 1].total_paid_cumulative
         }
 
         return {
