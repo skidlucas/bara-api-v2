@@ -11,9 +11,6 @@ export default defineConfig({
     user: process.env.MIKRO_ORM_USER,
     password: process.env.MIKRO_ORM_PASSWORD,
     dbName: process.env.MIKRO_ORM_DB_NAME,
-    driverOptions: {
-        connection: { ssl: true },
-    },
     entities: ['dist/**/*.entity.js'],
     entitiesTs: ['src/**/*.entity.ts'],
     debug: true,
