@@ -19,9 +19,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "schema:dump": "mikro-orm schema:create --dump",
-    "seed": "mikro-orm seeder:run",
-    "gcloud:deploy": "gcloud run deploy bara-api-v2 --source .",
-    "firebase:deploy": "firebase deploy --only hosting --project bara"
+    "migration:create": "mikro-orm migration:create",
+    "migration:up": "mikro-orm migration:up",
+    "seed": "mikro-orm seeder:run"
   },
   "dependencies": {
     "@mikro-orm/core": "^6.3.0",
@@ -37,6 +37,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/schedule": "^4.1.1",
     "@nestjs/swagger": "^7.4.0",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",

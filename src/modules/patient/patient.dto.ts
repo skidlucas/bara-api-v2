@@ -1,4 +1,4 @@
-import { IsNumberString, IsOptional, IsString } from 'class-validator'
+import { IsBooleanString, IsNumberString, IsOptional, IsString } from 'class-validator'
 
 export class PatientDto {
     @IsString()
@@ -21,4 +21,8 @@ export class FindPatientsQueryParams {
     @IsString()
     @IsOptional()
     search?: string
+
+    @IsBooleanString()
+    @IsOptional()
+    activeOnly?: boolean
 }

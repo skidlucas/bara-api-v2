@@ -12,11 +12,13 @@ import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { InsuranceModule } from './modules/insurance/insurance.module'
 import { PatientModule } from './modules/patient/patient.module'
 import { StatisticsModule } from './modules/statistics/statistics.module'
+import { ScheduleModule } from '@nestjs/schedule'
 
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         MikroOrmModule.forRoot(),
+        ScheduleModule.forRoot(),
         FixtureModule,
         UserModule,
         AuthModule,

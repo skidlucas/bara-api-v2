@@ -4,6 +4,7 @@ import { FindPatientsQueryParams, PatientDto } from './patient.dto'
 import { Patient } from '../../entities/patient.entity'
 import { Insurance } from '../../entities/insurance.entity'
 import { User } from '../../entities/user.entity'
+import { Cron, CronExpression } from '@nestjs/schedule'
 
 @Injectable()
 export class PatientService {
@@ -13,7 +14,7 @@ export class PatientService {
         userId: number,
         queryParams: FindPatientsQueryParams,
     ): Promise<{ data: Patient[]; totalItems: number }> {
-        const { limit, page, search } = queryParams
+        const { limit, page, search, activeOnly } = queryParams
 
         const where: any = { healthProfessional: { id: userId } }
 
@@ -21,6 +22,10 @@ export class PatientService {
             const ilikeSearch = { $ilike: `%${search}%` }
             where.firstname = ilikeSearch
             where.lastname = ilikeSearch
+        }
+
+        if (activeOnly) {
+            where.archived = false
         }
 
         const [patients, count] = await this.em.findAndCount(Patient, where, {
@@ -75,5 +80,24 @@ export class PatientService {
         } catch (err) {
             console.error(err)
         }
+    }
+
+    @Cron(CronExpression.EVERY_10_SECONDS)
+    async archivePatientsWithoutInvoices(): Promise<void> {
+        const now = new Date()
+        const lastYear = new Date(now.setFullYear(now.getFullYear() - 1))
+        const patients = await this.em.fork().find(Patient, {
+            invoices: { date: { $lt: lastYear } },
+            archived: false,
+        })
+
+        for (const patient of patients) {
+            patient.archived = true
+        }
+
+        // console.log(patients)
+        console.log(patients)
+
+        await this.em.persistAndFlush(patients)
     }
 }

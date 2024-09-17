@@ -7,7 +7,7 @@ import { SoftDeleteHandler } from 'mikro-orm-soft-delete'
 
 export default defineConfig({
     host: process.env.MIKRO_ORM_HOST,
-    // port: parseInt(process.env.MIKRO_ORM_PORT),
+    port: parseInt(process.env.MIKRO_ORM_PORT) || 5432,
     user: process.env.MIKRO_ORM_USER,
     password: process.env.MIKRO_ORM_PASSWORD,
     dbName: process.env.MIKRO_ORM_DB_NAME,
@@ -19,4 +19,8 @@ export default defineConfig({
     // @ts-expect-error nestjs adapter option
     registerRequestContext: false,
     extensions: [Migrator, SeedManager, SoftDeleteHandler],
+    migrations: {
+        path: 'dist/migrations',
+        pathTs: 'src/migrations',
+    },
 })
