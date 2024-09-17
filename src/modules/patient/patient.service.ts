@@ -82,7 +82,7 @@ export class PatientService {
         }
     }
 
-    @Cron(CronExpression.EVERY_10_SECONDS)
+    @Cron(CronExpression.EVERY_DAY_AT_2AM)
     async archivePatientsWithoutInvoices(): Promise<void> {
         const now = new Date()
         const lastYear = new Date(now.setFullYear(now.getFullYear() - 1))
@@ -94,9 +94,6 @@ export class PatientService {
         for (const patient of patients) {
             patient.archived = true
         }
-
-        // console.log(patients)
-        console.log(patients)
 
         await this.em.persistAndFlush(patients)
     }
