@@ -82,7 +82,7 @@ export class PatientService {
         }
     }
 
-    @Cron(CronExpression.EVERY_30_SECONDS)
+    @Cron(CronExpression.EVERY_DAY_AT_2AM)
     async archivePatientsWithoutInvoices(): Promise<void> {
         const em = this.em.fork()
         const now = new Date()
