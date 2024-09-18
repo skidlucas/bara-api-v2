@@ -82,13 +82,20 @@ export class PatientService {
         }
     }
 
-    @Cron(CronExpression.EVERY_DAY_AT_2AM)
+    @Cron(CronExpression.EVERY_30_SECONDS)
     async archivePatientsWithoutInvoices(): Promise<void> {
         const em = this.em.fork()
         const now = new Date()
         const lastYear = new Date(now.setFullYear(now.getFullYear() - 1))
-        const patients = await em.fork().find(Patient, {
-            invoices: { date: { $lt: lastYear } },
+
+        const patientsWithInvoicesSinceLastYear = em
+            .createQueryBuilder(Patient, 'p')
+            .select('p.id')
+            .leftJoin('p.invoices', 'i')
+            .where({ 'i.date': { $gt: lastYear } })
+
+        const patients = await em.createQueryBuilder(Patient, 'p').where({
+            id: { $nin: patientsWithInvoicesSinceLastYear.getKnexQuery() },
             archived: false,
         })
 
