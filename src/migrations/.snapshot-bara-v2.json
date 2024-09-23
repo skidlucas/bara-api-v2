@@ -205,16 +205,6 @@
           "length": 255,
           "mappedType": "string"
         },
-        "archived": {
-          "name": "archived",
-          "type": "boolean",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "default": "false",
-          "mappedType": "boolean"
-        },
         "health_professional_id": {
           "name": "health_professional_id",
           "type": "int",

@@ -4,7 +4,6 @@ import { FindPatientsQueryParams, PatientDto } from './patient.dto'
 import { Patient } from '../../entities/patient.entity'
 import { Insurance } from '../../entities/insurance.entity'
 import { User } from '../../entities/user.entity'
-import { Cron, CronExpression } from '@nestjs/schedule'
 
 @Injectable()
 export class PatientService {
@@ -14,7 +13,7 @@ export class PatientService {
         userId: number,
         queryParams: FindPatientsQueryParams,
     ): Promise<{ data: Patient[]; totalItems: number }> {
-        const { limit, page, search, activeOnly } = queryParams
+        const { limit, page, search } = queryParams
 
         const where: any = { healthProfessional: { id: userId } }
 
@@ -24,15 +23,11 @@ export class PatientService {
             where.lastname = ilikeSearch
         }
 
-        if (activeOnly) {
-            where.archived = false
-        }
-
         const [patients, count] = await this.em.findAndCount(Patient, where, {
             limit: limit,
             offset: limit * (page - 1),
             populate: ['insurance'],
-            fields: ['id', 'firstname', 'lastname', 'archived', 'insurance.name'],
+            fields: ['id', 'firstname', 'lastname', 'insurance.name'],
             orderBy: { lastname: QueryOrder.ASC, firstname: QueryOrder.ASC },
         })
 
@@ -80,29 +75,5 @@ export class PatientService {
         } catch (err) {
             console.error(err)
         }
-    }
-
-    @Cron(CronExpression.EVERY_DAY_AT_2AM)
-    async archivePatientsWithoutInvoices(): Promise<void> {
-        const em = this.em.fork()
-        const now = new Date()
-        const lastYear = new Date(now.setFullYear(now.getFullYear() - 1))
-
-        const patientsWithInvoicesSinceLastYear = em
-            .createQueryBuilder(Patient, 'p')
-            .select('p.id')
-            .leftJoin('p.invoices', 'i')
-            .where({ 'i.date': { $gt: lastYear } })
-
-        const patients = await em.createQueryBuilder(Patient, 'p').where({
-            id: { $nin: patientsWithInvoicesSinceLastYear.getKnexQuery() },
-            archived: false,
-        })
-
-        for (const patient of patients) {
-            patient.archived = true
-        }
-
-        await em.persistAndFlush(patients)
     }
 }

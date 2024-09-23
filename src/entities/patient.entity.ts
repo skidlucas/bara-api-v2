@@ -18,9 +18,6 @@ export class Patient extends BaseEntity {
     @Property()
     lastname!: string
 
-    @Property({ default: false })
-    archived!: boolean
-
     @ManyToOne()
     healthProfessional!: User
 
