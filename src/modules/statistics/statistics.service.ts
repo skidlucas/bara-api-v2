@@ -76,7 +76,7 @@ export class StatisticsService {
             totalLeftThisMonth = 0,
             total = 0
 
-        const currentMonthQueryResult: DashboardQueryResult = await this.em.getDriver().execute(
+        const currentMonthQueryResult: DashboardQueryResult[] = await this.em.getDriver().execute(
             `WITH invoice_current_month AS (
                     SELECT 
                         TO_CHAR(DATE_TRUNC('month', i.date), 'YYYY-MM') AS month,
@@ -107,14 +107,16 @@ export class StatisticsService {
             [userId],
         )
 
-        totalReceivedThisMonth =
-            (parseInt(currentMonthQueryResult[0].total_insurance_paid, 10) +
-                parseInt(currentMonthQueryResult[0].total_social_security_paid, 10)) /
-            100
-        totalLeftThisMonth =
-            (parseInt(currentMonthQueryResult[0].total_insurance_unpaid, 10) +
-                parseInt(currentMonthQueryResult[0].total_social_security_unpaid, 10)) /
-            100
+        if (currentMonthQueryResult?.length) {
+            totalReceivedThisMonth =
+                (parseInt(currentMonthQueryResult[0].total_insurance_paid, 10) +
+                    parseInt(currentMonthQueryResult[0].total_social_security_paid, 10)) /
+                100
+            totalLeftThisMonth =
+                (parseInt(currentMonthQueryResult[0].total_insurance_unpaid, 10) +
+                    parseInt(currentMonthQueryResult[0].total_social_security_unpaid, 10)) /
+                100
+        }
 
         if (metricsByMonth.length) {
             total = metricsByMonth[metricsByMonth.length - 1].total_paid_cumulative
