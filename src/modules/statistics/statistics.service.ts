@@ -8,7 +8,7 @@ interface DashboardQueryResult {
     total_social_security_unpaid: string
     total_insurance_paid: string
     total_insurance_unpaid: string
-    total_paid_cumulative: string
+    total_paid_cumulative?: string
 }
 
 @Injectable()
@@ -25,6 +25,8 @@ export class StatisticsService {
         metricsByMonth: MetricsByMonth[]
     }> {
         const { from, to } = queryParams
+        const formattedFrom = `${from} 00:00:00`
+        const formattedTo = `${to} 23:59:59`
 
         const queryResults: DashboardQueryResult[] = await this.em.getDriver().execute(
             `WITH invoice_totals AS (
@@ -55,7 +57,7 @@ export class StatisticsService {
                             invoice_totals
                         ORDER BY
                             month;`,
-            [from, to, userId],
+            [formattedFrom, formattedTo, userId],
         )
 
         const metricsByMonth: MetricsByMonth[] = []
@@ -70,16 +72,49 @@ export class StatisticsService {
             })
         }
 
-        const currentMonth = new Date().toISOString().slice(0, 7) // format YYYY-MM like the SQL result
-        const currentMonthData = metricsByMonth.find((row) => row.month === currentMonth)
-
         let totalReceivedThisMonth = 0,
             totalLeftThisMonth = 0,
             total = 0
-        if (currentMonthData) {
-            totalReceivedThisMonth = currentMonthData.total_insurance_paid + currentMonthData.total_social_security_paid
-            totalLeftThisMonth = currentMonthData.total_insurance_unpaid + currentMonthData.total_social_security_unpaid
-        }
+
+        const currentMonthQueryResult: DashboardQueryResult = await this.em.getDriver().execute(
+            `WITH invoice_current_month AS (
+                    SELECT 
+                        TO_CHAR(DATE_TRUNC('month', i.date), 'YYYY-MM') AS month,
+                        SUM(CASE WHEN i.is_social_security_paid THEN i.social_security_amount ELSE 0 END) AS total_social_security_paid,
+                        SUM(CASE WHEN NOT i.is_social_security_paid THEN i.social_security_amount ELSE 0 END) AS total_social_security_unpaid,
+                        SUM(CASE WHEN i.is_insurance_paid THEN i.insurance_amount ELSE 0 END) AS total_insurance_paid,
+                        SUM(CASE WHEN NOT i.is_insurance_paid THEN i.insurance_amount ELSE 0 END) AS total_insurance_unpaid
+                    FROM 
+                        invoice i
+                    JOIN patient p ON p.id = i.patient_id
+                    JOIN "user" u ON u.id = p.health_professional_id
+                    WHERE i.date BETWEEN DATE_TRUNC('month', now()) AND (DATE_TRUNC('month', now()) + interval '1 month' - interval '1 day')
+                        AND u.id = 1
+                        AND i.deleted_at IS NULL
+                    GROUP BY 
+                        TO_CHAR(DATE_TRUNC('month', i.date), 'YYYY-MM')
+                )
+                SELECT
+                    month,
+                    total_social_security_paid,
+                    total_social_security_unpaid,
+                    total_insurance_paid,
+                    total_insurance_unpaid
+                FROM
+                    invoice_current_month
+                ORDER BY
+                    month;`,
+            [userId],
+        )
+
+        totalReceivedThisMonth =
+            (parseInt(currentMonthQueryResult[0].total_insurance_paid, 10) +
+                parseInt(currentMonthQueryResult[0].total_social_security_paid, 10)) /
+            100
+        totalLeftThisMonth =
+            (parseInt(currentMonthQueryResult[0].total_insurance_unpaid, 10) +
+                parseInt(currentMonthQueryResult[0].total_social_security_unpaid, 10)) /
+            100
 
         if (metricsByMonth.length) {
             total = metricsByMonth[metricsByMonth.length - 1].total_paid_cumulative
