@@ -39,7 +39,7 @@ export class PatientService {
 
         const patient = new Patient({
             firstname,
-            lastname,
+            lastname: lastname.toUpperCase(),
             healthProfessional: this.em.getReference(User, userId),
             insurance: insuranceId ? this.em.getReference(Insurance, insuranceId) : null,
         })
