@@ -38,7 +38,7 @@ export class PatientService {
         const { firstname, lastname, insuranceId } = patientDto
 
         const patient = new Patient({
-            firstname,
+            firstname: `${firstname[0].toUpperCase()}${firstname.slice(1)}`,
             lastname: lastname.toUpperCase(),
             healthProfessional: this.em.getReference(User, userId),
             insurance: insuranceId ? this.em.getReference(Insurance, insuranceId) : null,
