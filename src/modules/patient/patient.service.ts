@@ -61,8 +61,8 @@ export class PatientService {
 
         const { firstname, lastname, insuranceId } = patientDto
 
-        patient.firstname = firstname
-        patient.lastname = lastname
+        patient.firstname = `${firstname[0].toUpperCase()}${firstname.slice(1)}`
+        patient.lastname = lastname.toUpperCase()
         if (insuranceId > 0) {
             patient.insurance = this.em.getReference(Insurance, insuranceId)
         } else if (insuranceId === 0) {
