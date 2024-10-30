@@ -8,11 +8,7 @@ import { Insurance } from '../../entities/insurance.entity'
 
 @Injectable()
 export class InvoiceService {
-    constructor(
-        private readonly em: EntityManager,
-        // private patientsService: PatientsService,
-        // private insurancesService: InsurancesService,
-    ) {}
+    constructor(private readonly em: EntityManager) {}
 
     async getInvoices(
         userId: number,
