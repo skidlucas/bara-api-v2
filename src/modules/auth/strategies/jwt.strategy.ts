@@ -20,14 +20,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             }),
 
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: process.env.ENVIRONMENT === 'local', // ignore expiration for local purposes
+            // ignoreExpiration: process.env.ENVIRONMENT === 'local', // ignore expiration for local purposes
+            ignoreExpiration: true, // ignore expiration for now
             issuer: process.env.CLERK_ISSUER_URL,
             algorithms: ['RS256'],
         })
     }
 
     async validate(payload: JwtPayload) {
-        console.log('JwtStrategy.validate', payload)
         return await this.userService.findEnrichedUserByClerkId(payload.sub)
     }
 }
