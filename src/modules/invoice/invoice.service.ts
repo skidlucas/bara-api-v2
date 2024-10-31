@@ -1,19 +1,30 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { Invoice } from '../../entities/invoice.entity'
-import { CreateInvoiceDto, FindInvoicesQueryParams, TogglePaymentDto, UpdateInvoiceDto } from './invoice.dto'
+import {
+    CreateInvoiceDto,
+    FindInvoicesQueryParams,
+    PaymentType,
+    TogglePaymentDto,
+    UpdateInvoiceDto,
+} from './invoice.dto'
 import { EntityManager, QueryOrder } from '@mikro-orm/postgresql'
 import { User } from '../../entities/user.entity'
 import { Patient } from '../../entities/patient.entity'
 import { Insurance } from '../../entities/insurance.entity'
+import { EmojiLogger } from '../logger/emoji-logger.service'
 
 @Injectable()
 export class InvoiceService {
-    constructor(private readonly em: EntityManager) {}
+    constructor(
+        private readonly em: EntityManager,
+        private readonly logger: EmojiLogger,
+    ) {}
 
     async getInvoices(
         userId: number,
         queryParams: FindInvoicesQueryParams,
     ): Promise<{ data: Invoice[]; totalItems: number }> {
+        this.logger.log('getInvoices', { userId, queryParams })
         const { limit, page, search, unpaid } = queryParams
 
         const where: any = { patient: { healthProfessional: { id: userId } } }
@@ -24,10 +35,10 @@ export class InvoiceService {
         }
 
         if (unpaid) {
-            if (unpaid === 'socialSecurity') {
+            if (unpaid === PaymentType.socialSecurity) {
                 where.isSocialSecurityPaid = false
                 where.socialSecurityAmount = { $gt: 0 }
-            } else if (unpaid === 'insurance') {
+            } else if (unpaid === PaymentType.insurance) {
                 where.isInsurancePaid = false
                 where.insuranceAmount = { $gt: 0 }
             }
@@ -58,6 +69,7 @@ export class InvoiceService {
     }
 
     async createInvoice(user: User, invoiceDto: CreateInvoiceDto): Promise<Invoice> {
+        this.logger.log('createInvoice', { user, invoiceDto })
         const {
             socialSecurityAmount,
             insuranceAmount,
@@ -84,14 +96,17 @@ export class InvoiceService {
             await this.em.persistAndFlush(invoice)
             return invoice
         } catch (err) {
-            console.error(err)
+            this.logger.error('createInvoice', { user, invoiceDto, err })
+            throw new InternalServerErrorException('Error creating invoice')
         }
     }
 
     async updateInvoice(invoiceId: number, user: User, invoiceDto: UpdateInvoiceDto): Promise<Invoice> {
+        this.logger.log('updateInvoice', { invoiceId, user, invoiceDto })
         const invoice = await this.em.findOne(Invoice, { id: invoiceId })
 
         if (!invoice) {
+            this.logger.error(`Invoice ${invoiceId} not found`, { invoiceId, user, invoiceDto })
             throw new NotFoundException(`Invoice ${invoiceId} not found`)
         }
 
@@ -133,14 +148,17 @@ export class InvoiceService {
             await this.em.persistAndFlush(invoice)
             return invoice
         } catch (err) {
-            console.error(err)
+            this.logger.error('updateInvoice', { invoiceId, user, invoiceDto, err })
+            throw new InternalServerErrorException('Error updating invoice')
         }
     }
 
     async deleteInvoice(invoiceId: number, user: User): Promise<void> {
+        this.logger.log('deleteInvoice', { invoiceId, user })
         const invoice = await this.em.findOne(Invoice, { id: invoiceId }, { populate: ['patient'] })
 
         if (!invoice) {
+            this.logger.error(`Invoice ${invoiceId} not found`, { invoiceId, user })
             throw new NotFoundException(`Invoice ${invoiceId} not found`)
         }
 
@@ -149,23 +167,26 @@ export class InvoiceService {
         try {
             await this.em.removeAndFlush(invoice)
         } catch (err) {
-            console.error(err)
+            this.logger.error('deleteInvoice', { invoiceId, user, err })
+            throw new InternalServerErrorException('Error deleting invoice')
         }
     }
 
     async toggleInvoicesPayment(togglePaymentDto: TogglePaymentDto): Promise<void> {
+        this.logger.log('toggleInvoicesPayment', { togglePaymentDto })
         const { invoiceIds, paymentType } = togglePaymentDto
         const invoices = await this.em.find(Invoice, { id: { $in: invoiceIds } })
 
         if (!invoices.length) {
+            this.logger.error(`Invoices ${invoiceIds.join(',')} not found`, { togglePaymentDto })
             throw new NotFoundException(`Invoices ${invoiceIds.join(',')} not found`)
         }
 
-        if (paymentType === 'socialSecurity') {
+        if (paymentType === PaymentType.socialSecurity) {
             for (const invoice of invoices) {
                 invoice.isSocialSecurityPaid = !invoice.isSocialSecurityPaid
             }
-        } else if (paymentType === 'insurance') {
+        } else if (paymentType === PaymentType.insurance) {
             for (const invoice of invoices) {
                 invoice.isInsurancePaid = !invoice.isInsurancePaid
             }
@@ -174,13 +195,15 @@ export class InvoiceService {
         try {
             await this.em.persistAndFlush(invoices)
         } catch (err) {
-            console.error(err)
+            this.logger.error('toggleInvoicesPayment', { togglePaymentDto, err })
+            throw new InternalServerErrorException('Error toggling invoices payment')
         }
     }
 
     checkIfPatientBelongsToUserOrThrowError(user: User, patientId: number) {
         const currentUserPatientIds = user.patients.map((patient) => patient.id)
         if (!currentUserPatientIds.includes(patientId)) {
+            this.logger.error(`This patient doesn't belong to this user.`, { user, patientId })
             throw new ForbiddenException(`This patient doesn't belong to this user.`)
         }
     }

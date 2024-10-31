@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { RequestMethod, ValidationPipe } from '@nestjs/common'
 import { clerkMiddleware } from '@clerk/express'
+import { HttpExceptionFilter } from './filters/http-exception.filter'
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule)
@@ -14,6 +15,7 @@ async function bootstrap() {
             transform: true,
         }),
     )
+    app.useGlobalFilters(new HttpExceptionFilter())
 
     app.use(clerkMiddleware())
 

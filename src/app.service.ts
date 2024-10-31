@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common'
+import { EmojiLogger } from './modules/logger/emoji-logger.service'
 
 @Injectable()
 export class AppService {
+    constructor(private readonly logger: EmojiLogger) {}
+
     healthCheck(): any {
+        this.logger.log('healthCheck')
+
         function format(uptime: number) {
             function pad(s: number) {
                 return (s < 10 ? '0' : '') + s

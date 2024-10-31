@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { EntityManager } from '@mikro-orm/postgresql'
 import { DashboardQueryParams, MetricsByMonth } from './statistics.dto'
+import { EmojiLogger } from '../logger/emoji-logger.service'
 
 interface DashboardQueryResult {
     month: string
@@ -13,7 +14,10 @@ interface DashboardQueryResult {
 
 @Injectable()
 export class StatisticsService {
-    constructor(private readonly em: EntityManager) {}
+    constructor(
+        private readonly em: EntityManager,
+        private readonly logger: EmojiLogger,
+    ) {}
 
     async getDashboardNumbers(
         userId: number,
@@ -24,6 +28,7 @@ export class StatisticsService {
         total: number
         metricsByMonth: MetricsByMonth[]
     }> {
+        this.logger.log('getDashboardNumbers', { userId, queryParams })
         const { from, to } = queryParams
         const formattedFrom = `${from} 00:00:00`
         const formattedTo = `${to} 23:59:59`

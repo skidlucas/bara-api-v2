@@ -10,6 +10,7 @@ import { InsuranceModule } from './modules/insurance/insurance.module'
 import { PatientModule } from './modules/patient/patient.module'
 import { StatisticsModule } from './modules/statistics/statistics.module'
 import { ClerkUserMiddleware } from './middlewares/clerk-user.middleware'
+import { LoggerModule } from './modules/logger/logger.module'
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { ClerkUserMiddleware } from './middlewares/clerk-user.middleware'
         InsuranceModule,
         PatientModule,
         StatisticsModule,
+        LoggerModule,
     ],
     controllers: [AppController],
     providers: [AppService],

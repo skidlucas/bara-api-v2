@@ -1,18 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { EntityManager, QueryOrder } from '@mikro-orm/postgresql'
 import { FindPatientsQueryParams, PatientDto } from './patient.dto'
 import { Patient } from '../../entities/patient.entity'
 import { Insurance } from '../../entities/insurance.entity'
 import { User } from '../../entities/user.entity'
+import { EmojiLogger } from '../logger/emoji-logger.service'
 
 @Injectable()
 export class PatientService {
-    constructor(private readonly em: EntityManager) {}
+    constructor(
+        private readonly em: EntityManager,
+        private readonly logger: EmojiLogger,
+    ) {}
 
     async getPatients(
         userId: number,
         queryParams: FindPatientsQueryParams,
     ): Promise<{ data: Patient[]; totalItems: number }> {
+        this.logger.log('getPatients', { userId, queryParams })
         const { limit, page, search } = queryParams
 
         const where: any = { healthProfessional: { id: userId } }
@@ -35,6 +40,7 @@ export class PatientService {
     }
 
     async createPatient(userId: number, patientDto: PatientDto): Promise<Patient> {
+        this.logger.log('createPatient', { userId, patientDto })
         const { firstname, lastname, insuranceId } = patientDto
 
         const patient = new Patient({
@@ -48,14 +54,17 @@ export class PatientService {
             await this.em.persistAndFlush(patient)
             return patient
         } catch (err) {
-            console.error(err)
+            this.logger.error('createPatient', { userId, patientDto, err })
+            throw new InternalServerErrorException('Failed to create patient')
         }
     }
 
     async updatePatient(patientId: number, userId: number, patientDto: PatientDto): Promise<Patient> {
+        this.logger.log('updatePatient', { patientId, userId, patientDto })
         const patient = await this.em.findOne(Patient, { id: patientId, healthProfessional: { id: userId } })
 
         if (!patient) {
+            this.logger.error(`Patient ${patientId} not found`, { patientId, userId, patientDto })
             throw new NotFoundException(`Patient ${patientId} not found`)
         }
 
@@ -73,7 +82,8 @@ export class PatientService {
             await this.em.persistAndFlush(patient)
             return patient
         } catch (err) {
-            console.error(err)
+            this.logger.error('updatePatient', { patientId, userId, patientDto, err })
+            throw new InternalServerErrorException('Failed to update patient')
         }
     }
 }

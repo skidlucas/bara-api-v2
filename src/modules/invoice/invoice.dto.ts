@@ -80,10 +80,14 @@ export class FindInvoicesQueryParams {
     unpaid?: string
 }
 
+export enum PaymentType {
+    socialSecurity = 'socialSecurity',
+    insurance = 'insurance',
+}
 export class TogglePaymentDto {
     @IsArray()
     invoiceIds: number[]
 
-    @IsEnum(['socialSecurity', 'insurance'])
+    @IsEnum(PaymentType)
     paymentType: 'socialSecurity' | 'insurance'
 }

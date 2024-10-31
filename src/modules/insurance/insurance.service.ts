@@ -1,13 +1,18 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { EntityManager, QueryOrder } from '@mikro-orm/postgresql'
 import { CreateInsuranceDto, FindInsurancesQueryParams } from './insurance.dto'
 import { Insurance } from '../../entities/insurance.entity'
+import { EmojiLogger } from '../logger/emoji-logger.service'
 
 @Injectable()
 export class InsuranceService {
-    constructor(private readonly em: EntityManager) {}
+    constructor(
+        private readonly em: EntityManager,
+        private readonly logger: EmojiLogger,
+    ) {}
 
     async getInsurances(queryParams: FindInsurancesQueryParams): Promise<{ data: Insurance[]; totalItems: number }> {
+        this.logger.log('getInsurances', { queryParams })
         const { limit, page, search } = queryParams
 
         const where: any = {}
@@ -29,6 +34,7 @@ export class InsuranceService {
     }
 
     async createInsurance(insuranceDto: CreateInsuranceDto): Promise<Insurance> {
+        this.logger.log('createInsurance', { insuranceDto })
         const { name, amcNumber } = insuranceDto
 
         const insurance = new Insurance({
@@ -40,7 +46,8 @@ export class InsuranceService {
             await this.em.persistAndFlush(insurance)
             return insurance
         } catch (err) {
-            console.error(err)
+            this.logger.error('createInsurance', { insuranceDto, err })
+            throw new InternalServerErrorException('Failed to create insurance')
         }
     }
 }
