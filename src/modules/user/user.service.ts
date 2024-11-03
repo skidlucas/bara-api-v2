@@ -1,21 +1,29 @@
+import { CreateRequestContext, EntityManager, MikroORM } from '@mikro-orm/postgresql'
 import { Injectable } from '@nestjs/common'
 import { User } from '../../entities/user.entity'
-import { InjectRepository } from '@mikro-orm/nestjs'
-import { CreateRequestContext, EntityRepository, MikroORM } from '@mikro-orm/postgresql'
 import { EmojiLogger } from '../logger/emoji-logger.service'
 
 @Injectable()
 export class UserService {
     constructor(
         private readonly orm: MikroORM,
-        @InjectRepository(User)
-        private userRepository: EntityRepository<User>,
+        private readonly em: EntityManager,
         private readonly logger: EmojiLogger,
     ) {}
 
     @CreateRequestContext()
     async findEnrichedUserByClerkId(clerkId: string): Promise<User> {
         this.logger.log('findEnrichedUserByClerkId', { clerkId })
-        return await this.userRepository.findOne({ clerkId }, { populate: ['patients'] })
+
+        return await this.em.findOne(User, { clerkId }, { populate: ['patients'] })
+    }
+
+    @CreateRequestContext()
+    async createUser(clerkId: string): Promise<User> {
+        this.logger.log('createUser', { clerkId })
+        const user = new User({ clerkId })
+        await this.em.persistAndFlush(user)
+
+        return user
     }
 }
